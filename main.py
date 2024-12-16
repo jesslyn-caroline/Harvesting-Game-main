@@ -6,7 +6,8 @@ from day import Day
 from user import User
 from market import UpcomingItem, Market
 from inventory import Inventory
-
+from chicken import Chicken
+from barn import Barn
 
 day = Day()
 farm = Farm()
@@ -15,7 +16,7 @@ upcoming_item = UpcomingItem() # To update market items
 market = Market()
 inventory = Inventory()
 user = User()
-
+barn = Barn()
 
 def cls(): os.system('cls' if os.name == 'nt' else 'clear')
 
@@ -127,6 +128,12 @@ def end_day():
     market.sell.update_price(corn_price, potato_price, tomato_price, carrot_price)
 
     user.statistic[day.get_day()] = []
+
+    
+
+    died_chicken = barn.check_chicken_status()
+    for chicken in died_chicken:
+        print(f'> 🐓 {chicken} has died out of starvation')
 
 # ==== End of End Day ==== #
 
@@ -285,6 +292,57 @@ def statistic_menu():
 # ==== End of Statistic ==== #
 
 
+# ==== Start of Barn Menu ==== #
+
+def barn_menu():
+    while True:
+        print('-' * 80)
+        print(f'{'🐮 Chicken Barn 🐮':^80}')
+        print('-' * 80)
+        
+        print('> 1. Check Chicken List')
+        print('> 2. Feed Chicken')
+        print('> 3. Check Collectable Eggs')
+        print('> 4. Go Back')
+
+        print('-' * 80)
+
+        valid = False
+        while not valid:
+            try:
+                choice = input('> Enter your choice: ')
+                if choice == '': raise ValueError('> ❗ Choice may not be empty!\n')
+                if not choice.isnumeric(): raise ValueError('> ❗ Choice must be a number!\n')
+                if int(choice) < 1 or int(choice) > 4: raise ValueError('> ❗ Out of choices, please enter the correct number!\n')
+                valid = True
+
+            except ValueError as e:
+                print(str(e))
+        
+        cls()
+        if choice == '1':
+            barn.print_chicken_barn()
+
+        elif choice == '2':
+            barn.feed_chicken()
+            print('Feeding chicken')
+
+        elif choice == '3':
+            collectible_eggs = barn.collect_eggs()
+            print(f'You collect {collectible_eggs} eggs')
+
+        elif choice == '4':
+            print('Going back...')
+            break
+
+        if choice in ['1', '2', '3']:
+            input('> Press any key to continue...')
+        
+        cls()
+
+# ==== End of Barn Menu ==== #
+
+
 # ==== Pre Program ==== #
 
 upcoming_item_list = upcoming_item.check_unlocked_items(day.get_day())
@@ -296,6 +354,8 @@ tomato_price = random.randint(45, 65)
 carrot_price = random.randint(50, 80)
 market.sell.update_price(corn_price, potato_price, tomato_price, carrot_price)
 
+chick = Chicken("Chic")
+barn.add_chicken(chick)
 
 # ==== Main  Program ==== #
 
@@ -322,6 +382,8 @@ while True:
 
     if choice == '1':
         farm_menu()
+    if choice == '2':
+        barn_menu()
     elif choice == '3':
         end_day()
     elif choice == '4':
